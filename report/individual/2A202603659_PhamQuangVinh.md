@@ -10,30 +10,41 @@
 
 | Tệp | Có? |
 | --- | --- |
-| [`day01_lab.ipynb`](day01_lab.ipynb) — notebook đã chạy, còn output | ☐ |
-| [`lab1_report.json`](lab1_report.json) — do ô "Báo cáo cuối" sinh ra | ☐ |
+| [`day01_lab.ipynb`](day01_lab.ipynb) — notebook đã chạy, còn output | ☑ |
+| [`lab1_report.json`](lab1_report.json) — do ô "Báo cáo cuối" sinh ra | ☑ |
 | [`hand_calc.jpg`](hand_calc.jpg) — ảnh tính tay có các bước | ☐ |
 
 ## 2. Kết quả chính
 
-*Chép bảng so sánh cuối Phần 5 (F1 test, F1 SUB 40, p95 ms/tin, USD/1k tin) của chính bạn.*
+
 
 ## 3. Dự đoán và thực tế
 
-*Chọn 3 dự đoán `predict(...)` lệch nhiều nhất so với kết quả. Mỗi cái: bạn đoán gì, ra gì, vì sao lệch.*
+
 
 ## 4. Phân tích 50 case khó
 
-*Model nào tụt nhiều nhất, ở nhóm case nào? Nêu 2 case cụ thể và cơ chế khiến model sai.*
+
 
 ## 5. Thử thách cá nhân
 
-*Đề theo SEED của bạn, cách làm, kết quả, giải thích.*
+
 
 ## 6. Phương án cho sản phẩm thật
 
-*Với yêu cầu p95 < 50 ms/tin cho 10 triệu SMS/ngày: chọn phương án nào, dẫn số liệu nào, chấp nhận đánh đổi gì.*
+- Chọn phương án: Cascade Classifier (Mô hình kết hợp đa tầng) — Dùng mô hình truyền thống nhẹ (BoW/ML) làm tuyến đầu xử lý phần lớn tin nhắn, chỉ chuyển các tin nhắn khó/mập mờ sang LLM ở tuyến sau.
+- Dẫn số liệu:
++ Tải hệ thống: 10 triệu SMS/ngày (~116 tin/giây).
++ SLA: p95 < 50 ms.
++ Mô hình truyền thống đạt độ trễ chỉ vài ms (đáp ứng tốt SLA), trong khi gọi LLM đơn lẻ mất 200ms (vi phạm nghiêm trọng SLA).
+- Chấp nhận đánh đổi:
++ Giảm nhẹ độ chính xác tổng thể (F1) so với việc dùng 100% LLM, do tuyến đầu có thể bỏ sót các ca đánh đố (ham_looks_spam, obfuscation).
++ Tăng độ phức tạp kiến trúc hệ thống (cần logic định tuyến động giữa các tier) và chi phí API phát sinh cho các tin nhắn chuyển tiếp lên LLM.
 
 ## 7. AI log và điều đã học
 
-*Mỗi lần dùng AI: hỏi gì, nhận gì, bạn sửa gì. Sau đó 2–3 câu: điều bạn hiểu ra hôm nay mà trước đó chưa hiểu.*
+Hỏi gì: Cách khắc phục lỗi RateLimitError (429) và NotFoundError (404) của OpenAI, tối ưu tham số max_tokens/temperature, dự đoán biểu đồ Pareto và thiết kế hệ thống đạt SLA cho 10 triệu tin nhắn/ngày.
+
+Nhận gì: Hướng dẫn chuyển đổi sang endpoint OpenAI-compatible của Gemini, mẫu code xử lý linh hoạt cho cả môi trường test lẫn thực tế, cùng phân tích chi tiết về cơ chế suy luận ngầm của LLM.
+
+Bạn sửa gì: Cập nhật logic phân nhánh nhà cung cấp (LLM_PROVIDER) trong hàm call_openai, tinh chỉnh thông số prompt và chuẩn hóa hồ sơ nộp bài theo đúng quy định.
